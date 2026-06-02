@@ -259,7 +259,7 @@ static cl::opt<bool> DisableExpandReductions(
 
 /// Disable the select optimization pass.
 static cl::opt<bool> DisableSelectOptimize(
-    "disable-select-optimize", cl::init(true), cl::Hidden,
+    "disable-select-optimize", cl::init(false), cl::Hidden,
     cl::desc("Disable the select-optimization pass from running"));
 
 /// Enable garbage-collecting empty basic blocks.
@@ -899,7 +899,8 @@ void TargetPassConfig::addIRPasses() {
     addPass(createExpandReductionsPass());
 
   // Convert conditional moves to conditional jumps when profitable.
-  if (getOptLevel() != CodeGenOptLevel::None && !DisableSelectOptimize)
+  if (getOptLevel() != CodeGenOptLevel::None && !DisableSelectOptimize &&
+      TM->getTargetTriple().isX86())
     addPass(createSelectOptimizePass());
 
   if (EnableGlobalMergeFunc)
